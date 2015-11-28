@@ -60,17 +60,58 @@ function glContext(canvasID){
 function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsArray,elementIndexArray){
 	this.last_update = Date.now();
 	this.initialized = false;
+	this.vertices = vertexArray;
+	this.colors = vertexColorsArray;
+	this.indices = elementIndexArray;
 	this.init = function(){
 		console.log('heres where we init the shaders, buffers, and other things');
+		this.indexBuffer = gl.createBuffer();
+		if (!indexBuffer) {
+			return -1;
+		}
+
+		// Write the vertex coordinates and color to the buffer object
+		if (!this.initArrayBuffer(gl, vertices, 3, gl.FLOAT, 'a_Position')){
+			return -1;
+		}
+
+		if (!this.initArrayBuffer(gl, colors, 3, gl.FLOAT, 'a_Color')){
+			return -1;
+		}
+		
+		this.initialized = true;
 	}
 	
 	this.draw = function(){
 		this.animate(Date.now() - this.last_update);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
 	};
 
 	this.animate = function(elapsed){
 	};
-}
+	
+	this.initArrayBuffer = function(gl, data, num, type, attribute) {
+		var buffer = gl.createBuffer();   // Create a buffer object
+		if (!buffer) {
+			console.log('Failed to create the buffer object');
+			return false;
+		}
+		// Write date into the buffer object
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+		// Assign the buffer object to the attribute variable
+		var a_attribute = gl.getAttribLocation(gl.program, attribute);
+		if (a_attribute < 0) {
+			console.log('Failed to get the storage location of ' + attribute);
+			return false;
+		}
+		gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0);
+		// Enable the assignment of the buffer object to the attribute variable
+		gl.enableVertexAttribArray(a_attribute);
+
+		return true;
+	}
 
 function getResourceAsync(url,callback,callbackArgsArray){
 	console.log('Beginning ajax request for: ' + url.toString());
