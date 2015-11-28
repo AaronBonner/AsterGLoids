@@ -26,7 +26,7 @@ function glContext(canvasID){
 	}
 }
 
-function ship(vertexShaderUrl,fragmentShaderUrl,vertexArray,vertexColorsArray,elementIndexArray,callback){
+function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsArray,elementIndexArray,callback){
 	this.last_update = Date.now();
 	this.initialized = false;
 	this.init = function(){
@@ -40,5 +40,47 @@ function ship(vertexShaderUrl,fragmentShaderUrl,vertexArray,vertexColorsArray,el
 
 	this.animate = function(elapsed){
 		console.log('Elapsed time is ' + elapsed.toString());
+	}
+}
+
+function getResourceAsync(url,callback){
+	console.log('Beginning ajax request for: ' + url.toString());
+	$.ajax({
+			url: url,
+			dataType: "text",
+			contentType: "text/plain",
+			cache: false
+		}).done(function(data) {
+			console.log('Calling back from ajax request for: ' + url.toString() + 'with data: ' + data.toString());
+			callback(data);
+		});
+}
+
+function getObjectResources(resourceUrls,callback){
+	var resourceReadyStatuses = [];
+	var fetchedResources = [];
+	console.log(resourceUrls);
+	for(i=0;i<resourceUrls.length;i++){
+		resourceReadyStatuses[i] = false;
+		getResourceAsync(resourceUrls[i],function(data){
+			console.log('Setting fetchedResources['+i.toString()+'] to data: ' + data.toString());
+			fetchedResources[i] = data;
+			resourceReadyStatuses[i] = true;
+		});
+	}
+	
+	var interval = setInterval(checkResources, 20);
+	function checkResources(){
+		ready = true;
+		for(i=0;i<resourceReadyStatuses.length;i++){
+			if( resourceReadyStatuses[i] != true){
+				ready = false;
+				break;
+			}
+		}
+		if(ready){
+			clearInterval(interval);
+			return callback(fetchedResources);
+		}
 	}
 }
