@@ -43,7 +43,7 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 	}
 }
 
-function getResourceAsync(url,callback){
+function getResourceAsync(url,callback,callbackArgsArray){
 	console.log('Beginning ajax request for: ' + url.toString());
 	$.ajax({
 			url: url,
@@ -52,7 +52,11 @@ function getResourceAsync(url,callback){
 			cache: false
 		}).done(function(data) {
 			console.log('Calling back from ajax request for: ' + url.toString() + 'with data: ' + data.toString());
-			callback(data);
+			argsArray = [data];
+			for(i=0;i<callbackArgsArray.length;i++){
+				argsArray.push(callbackArgsArray[i]);
+			}
+			callback(data,callbackArgsArray);
 		});
 }
 
@@ -62,11 +66,12 @@ function getObjectResources(resourceUrls,callback){
 	console.log(resourceUrls);
 	for(i=0;i<resourceUrls.length;i++){
 		resourceReadyStatuses[i] = false;
-		getResourceAsync(resourceUrls[i],function(data){
+		console.log('calling getResourceAsync' );
+		getResourceAsync(resourceUrls[i],function(data,callbackArgsArray){
 			console.log('Setting fetchedResources['+i.toString()+'] to data: ' + data.toString());
-			fetchedResources[i] = data;
-			resourceReadyStatuses[i] = true;
-		});
+			fetchedResources[callbackArgsArray[0]] = data;
+			resourceReadyStatuses[callbackArgsArray[0]] = true;
+		},[i]);
 	}
 	
 	var interval = setInterval(checkResources, 20);
