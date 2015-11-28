@@ -15,21 +15,21 @@ function main() {
 		VSHADER_SOURCE = shaders['VSHADER_SOURCE'];
 		FSHADER_SOURCE = shaders['FSHADER_SOURCE'];
 		console.log('gotshaders');
-	});
-	
-	if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-		console.log('Failed to initialize shaders.');
-		return;
-	}
-	
-	console.log('vshader:');
-	console.log(VSHADER_SOURCE);
-	console.log('fshader:');
-	console.log(FSHADER_SOURCE);
-	
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		
+		if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+			console.log('Failed to initialize shaders.');
+			return;
+		}
+		
+		console.log('vshader:');
+		console.log(VSHADER_SOURCE);
+		console.log('fshader:');
+		console.log(FSHADER_SOURCE);
+		
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-	gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+	});
 }
 
 function getShadersFromXHR(vertexShaderURL,fragmentShaderURL,callback) {
