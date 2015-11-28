@@ -31,7 +31,7 @@ function main() {
 			20,21,22,  20,22,23     // back
 		]);
 		console.log(resourceArray);
-		context.addGLObject(new ship(resourceArray[0],resourceArray[1],verticies,colors,indexes));
+		context.addGLObject(new ship(resourceArray[0],resourceArray[1],vertices,colors,indices));
 	});
 	
 	var tick = function() {
@@ -66,12 +66,10 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 	
 	this.draw = function(){
 		this.animate(Date.now() - this.last_update);
-		console.log('here is where things would be drawn');
 	};
 
 	this.animate = function(elapsed){
-		console.log('Elapsed time is ' + elapsed.toString());
-	}
+	};
 }
 
 function getResourceAsync(url,callback,callbackArgsArray){
