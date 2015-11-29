@@ -31,7 +31,7 @@ function main() {
 			20,21,22,  20,22,23     // back
 		]);
 		console.log(resourceArray);
-		context.addGLObject(new ship(resourceArray[0],resourceArray[1],vertices,colors,indices).init());
+		context.addGLObject(new ship(window.context,resourceArray[0],resourceArray[1],vertices,colors,indices).init());
 	});
 	
 	var tick = function() {
@@ -44,10 +44,23 @@ function main() {
 	tick();
 }
 
+function camera() {
+	this.posX = 3;
+	this.posY = 3;
+	this.posZ = 7;
+	this.targetX = 0;
+	this.targetY = 0;
+	this.targetZ = 0;
+	this.upX = 0;
+	this.upY = 1;
+	this.upZ = 0;
+}
+
 function glContext(canvasID){
 	this.glObjects = [];
 	this.canvas = document.getElementById(canvasID);
 	this.gl = getWebGLContext(this.canvas);
+	this.camera = new camera();
 	console.log(this.gl);
 	
 	this.addGLObject = function(glObj){
@@ -57,12 +70,13 @@ function glContext(canvasID){
 	}
 }
 
-function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsArray,elementIndexArray){
+function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsArray,elementIndexArray){
 	this.last_update = Date.now();
 	this.initialized = false;
 	this.vertices = vertexArray;
 	this.colors = vertexColorsArray;
 	this.indices = elementIndexArray;
+	this.context = context;
 	
 	this.init = function(){
 		console.log('heres where we init the shaders, buffers, and other things');
@@ -106,7 +120,10 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 		// Set the eye point and the viewing volume
 		var mvpMatrix = new Matrix4();
 		mvpMatrix.setPerspective(30, 1, 1, 100);
-		mvpMatrix.lookAt(3, 3, 7, 0, 0, 0, 0, 1, 0);
+		mvpMatrix.lookAt(context.camera.posX, context.camera.posY, 
+							context.camera.posZ, context.camera.targetX,
+							context.camera.targetY, context.camera.targetZ, 
+							context.camera.upX, context.camera.upY, context.camera.upZ);
 
 		// Pass the model view projection matrix to u_MvpMatrix
 		gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
