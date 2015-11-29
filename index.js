@@ -112,6 +112,7 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 
 		return true;
 	}
+}
 
 function getResourceAsync(url,callback,callbackArgsArray){
 	console.log('Beginning ajax request for: ' + url.toString());
