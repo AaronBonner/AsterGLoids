@@ -1,6 +1,7 @@
 function main() {
 	window.context = new glContext("webgl");
 	window.gl = context.gl;
+	window.direction = 1;
 	gl.clearColor(0, 0, 0, 1);
 	console.log(context);
 	getObjectResources(['shaders/shader1.vshader','shaders/shader1.fshader'],function(resourceArray){
@@ -36,6 +37,14 @@ function main() {
 	
 	var tick = function() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		
+		if (context.camera.posX > 7){
+			direction = -1;
+		} else if (context.camera.posX < 0) {
+			direction = 1;
+		}
+		context.camera.posX += 0.1 * direction;
+		
 		for(i=0;i<context.glObjects.length;i++){
 			context.glObjects[i].draw();
 		}
