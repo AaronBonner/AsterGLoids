@@ -86,6 +86,7 @@ function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertex
 	this.colors = vertexColorsArray;
 	this.indices = elementIndexArray;
 	this.context = context;
+	this.arrayBuffers = [];
 	
 	this.init = function(){
 		console.log('heres where we init the shaders, buffers, and other things');
@@ -116,9 +117,20 @@ function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertex
 	}
 	
 	this.draw = function(){
+		gl.useProgram(this.program);
+		gl.program = this.program;
+		for(i=0;i<this.arrayBuffers.length;i++){
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.arrayBuffers[i]['buffer']);
+			
+			gl.vertexAttribPointer(this.arrayBuffers[i]['vertexAttribParams']['a_attribute'], 
+			this.arrayBuffers[i]['vertexAttribParams']['num'], 
+			this.arrayBuffers[i]['vertexAttribParams']['type'], false, 0, 0);
+			gl.enableVertexAttribArray(this.arrayBuffers[i]['vertexAttribParams']['a_attribute']);
+		}
 		this.animate(Date.now() - this.last_update);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+		
 		
 		var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
 		if (!u_MvpMatrix) {
@@ -161,6 +173,7 @@ function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertex
 		// Enable the assignment of the buffer object to the attribute variable
 		gl.enableVertexAttribArray(a_attribute);
 
+		this.arrayBuffers.push({'buffer':buffer,'vertexAttribParams':{'a_attribute':a_attribute,'num':num,'type':type}});
 		return true;
 	}
 	
