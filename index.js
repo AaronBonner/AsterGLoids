@@ -43,7 +43,7 @@ function main() {
 		} else if (context.camera.posX < 0) {
 			direction = 1;
 		}
-		context.camera.posX += 0.1 * direction;
+		context.camera.posX += 0.01 * direction;
 		
 		for(i=0;i<context.glObjects.length;i++){
 			context.glObjects[i].draw();
