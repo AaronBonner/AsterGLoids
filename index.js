@@ -31,7 +31,7 @@ function main() {
 			20,21,22,  20,22,23     // back
 		]);
 		console.log(resourceArray);
-		context.addGLObject(new ship(resourceArray[0],resourceArray[1],vertices,colors,indices));
+		context.addGLObject(new ship(resourceArray[0],resourceArray[1],vertices,colors,indices).init());
 	});
 	
 	var tick = function() {
@@ -63,19 +63,20 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 	this.vertices = vertexArray;
 	this.colors = vertexColorsArray;
 	this.indices = elementIndexArray;
+	
 	this.init = function(){
 		console.log('heres where we init the shaders, buffers, and other things');
 		this.indexBuffer = gl.createBuffer();
-		if (!indexBuffer) {
+		if (!this.indexBuffer) {
 			return -1;
 		}
 
 		// Write the vertex coordinates and color to the buffer object
-		if (!this.initArrayBuffer(gl, vertices, 3, gl.FLOAT, 'a_Position')){
+		if (!this.initArrayBuffer(gl, this.vertices, 3, gl.FLOAT, 'a_Position')){
 			return -1;
 		}
 
-		if (!this.initArrayBuffer(gl, colors, 3, gl.FLOAT, 'a_Color')){
+		if (!this.initArrayBuffer(gl, this.colors, 3, gl.FLOAT, 'a_Color')){
 			return -1;
 		}
 		
