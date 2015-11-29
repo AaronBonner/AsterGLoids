@@ -66,6 +66,12 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 	
 	this.init = function(){
 		console.log('heres where we init the shaders, buffers, and other things');
+		
+		if (!this.initShaders(gl, vertexShaderSource,fragmentShaderSource)){
+			console.log('failed to init shaders.');
+			return -1;
+		}
+		
 		this.indexBuffer = gl.createBuffer();
 		if (!this.indexBuffer) {
 			return -1;
@@ -81,6 +87,7 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 		}
 		
 		this.initialized = true;
+		return this;
 	}
 	
 	this.draw = function(){
@@ -115,7 +122,38 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 	}
 	
 	this.initShaders = function(gl,vertexShaderSource,fragmentShaderSource){
+		this.vertexShader = loadShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+		this.fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 		
+		if (!this.vertexShader || !this.fragmentShader) {
+			console.log('failed to load shaders');
+			return null;
+		}
+		
+		this.program = gl.createProgram();
+			if (!this.program) {
+			return null;
+		}
+		
+		gl.attachShader(this.program, this.vertexShader);
+		gl.attachShader(this.program, this.fragmentShader);
+		
+		gl.linkProgram(this.program);
+		
+		var linked = gl.getProgramParameter(this.program, gl.LINK_STATUS);
+		if (!linked) {
+			var error = gl.getProgramInfoLog(this.program);
+			console.log('Failed to link program: ' + error);
+			gl.deleteProgram(this.program);
+			gl.deleteShader(this.fragmentShader);
+			gl.deleteShader(this.vertexShader);
+			return null;
+		}
+		
+		gl.useProgram(this.program);
+		gl.program = this.program;
+		
+		return true;
 	}
 }
 
