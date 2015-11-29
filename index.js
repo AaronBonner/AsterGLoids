@@ -113,6 +113,10 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 
 		return true;
 	}
+	
+	this.initShaders = function(gl,vertexShaderSource,fragmentShaderSource){
+		
+	}
 }
 
 function getResourceAsync(url,callback,callbackArgsArray){
