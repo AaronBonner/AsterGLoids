@@ -86,6 +86,8 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 			return -1;
 		}
 		
+		gl.enable(gl.DEPTH_TEST);
+		
 		this.initialized = true;
 		return this;
 	}
@@ -94,6 +96,21 @@ function ship(vertexShaderSource,fragmentShaderSource,vertexArray,vertexColorsAr
 		this.animate(Date.now() - this.last_update);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+		
+		var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
+		if (!u_MvpMatrix) {
+			console.log('Failed to get the storage location of u_MvpMatrix');
+			return;
+		}
+
+		// Set the eye point and the viewing volume
+		var mvpMatrix = new Matrix4();
+		mvpMatrix.setPerspective(30, 1, 1, 100);
+		mvpMatrix.lookAt(3, 3, 7, 0, 0, 0, 0, 1, 0);
+
+		// Pass the model view projection matrix to u_MvpMatrix
+		gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
+		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_BYTE, 0);
 	};
 
 	this.animate = function(elapsed){
