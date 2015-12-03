@@ -1,7 +1,11 @@
 function main() {
 	window.context = new glContext("webgl");
 	window.gl = context.gl;
-	window.direction = 1;
+	window.cameraRotateDirection = 1;
+	window.boxTranslateDirection = 1;
+	window.translateX = 0.0;
+	window.translateY = 0.0;
+	window.translateZ = 0.0;
 	gl.clearColor(0, 0, 0, 1);
 	console.log(context);
 	getObjectResources(['shaders/shader1.vshader','shaders/shader1.fshader'],function(resourceArray){
@@ -37,14 +41,21 @@ function main() {
 	
 	var tick = function() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		/*
+		
 		if (context.camera.posX > 7){
-			direction = -1;
+			cameraRotateDirection = -1;
 		} else if (context.camera.posX < 0) {
-			direction = 1;
+			cameraRotateDirection = 1;
 		}
-		context.camera.posX += 0.01 * direction;
-		*/
+		context.camera.posX += 0.01 * cameraRotateDirection;
+		
+		if (window.translateX > 1){
+			window.boxTranslateDirection = -0.1;
+		} else if (window.translateX < -1) {
+			window.boxTranslateDirection = 0.1;
+		}
+		window.translateX += 0.1 * window.boxTranslateDirection;
+		
 		for(i=0;i<context.glObjects.length;i++){
 			context.glObjects[i].draw();
 		}
@@ -140,7 +151,9 @@ function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertex
 
 		// Set the eye point and the viewing volume
 		var mvpMatrix = mat4.create();
-		mat4.perspective(mvpMatrix,0.523599, 1, 1, 100);
+		var perspMatrix = mat4.perspective(mat4.create(),0.523599, 1, 1, 100);
+		mat4.multiply(mvpMatrix,mvpMatrix,mat4.translate(mat4.create(),mat4.create(),[window.translateX,window.translateY,window.translateZ]));
+		mat4.multiply(mvpMatrix,mvpMatrix,perspMatrix);
 		var lookat = mat4.lookAt(mat4.create(),vec3.fromValues(context.camera.posX, context.camera.posY, 
 							context.camera.posZ), vec3.fromValues(context.camera.targetX,
 							context.camera.targetY, context.camera.targetZ), 
