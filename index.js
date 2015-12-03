@@ -37,14 +37,14 @@ function main() {
 	
 	var tick = function() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		
+		/*
 		if (context.camera.posX > 7){
 			direction = -1;
 		} else if (context.camera.posX < 0) {
 			direction = 1;
 		}
 		context.camera.posX += 0.01 * direction;
-		
+		*/
 		for(i=0;i<context.glObjects.length;i++){
 			context.glObjects[i].draw();
 		}
@@ -139,15 +139,16 @@ function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertex
 		}
 
 		// Set the eye point and the viewing volume
-		var mvpMatrix = new Matrix4();
-		mvpMatrix.setPerspective(30, 1, 1, 100);
-		mvpMatrix.lookAt(context.camera.posX, context.camera.posY, 
-							context.camera.posZ, context.camera.targetX,
-							context.camera.targetY, context.camera.targetZ, 
-							context.camera.upX, context.camera.upY, context.camera.upZ);
-
+		var mvpMatrix = mat4.create();
+		mat4.perspective(mvpMatrix,0.523599, 1, 1, 100);
+		var lookat = mat4.lookAt(mat4.create(),vec3.fromValues(context.camera.posX, context.camera.posY, 
+							context.camera.posZ), vec3.fromValues(context.camera.targetX,
+							context.camera.targetY, context.camera.targetZ), 
+							vec3.fromValues(context.camera.upX, context.camera.upY, context.camera.upZ));
+		mat4.multiply(mvpMatrix,mvpMatrix,lookat);
+		
 		// Pass the model view projection matrix to u_MvpMatrix
-		gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
+		gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix);
 		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_BYTE, 0);
 	};
 
