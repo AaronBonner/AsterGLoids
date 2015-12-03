@@ -49,9 +49,9 @@ function main() {
 		}
 		context.camera.posX += 0.01 * cameraRotateDirection;
 		
-		if (window.translateX > 1){
+		if (window.translateX > 0.3){
 			window.boxTranslateDirection = -0.1;
-		} else if (window.translateX < -1) {
+		} else if (window.translateX < -0.3) {
 			window.boxTranslateDirection = 0.1;
 		}
 		window.translateX += 0.1 * window.boxTranslateDirection;
