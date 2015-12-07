@@ -1,5 +1,5 @@
 function main() {
-	window.context = new glContext("webgl");
+	window.context = new glContext($('#glcontext .webgl')[0],$('#glcontext .fps')[0]);
 	window.gl = context.gl;
 	window.cameraRotateDirection = 1;
 	window.boxTranslateDirection = 1;
@@ -40,6 +40,7 @@ function main() {
 	});
 	
 	var tick = function() {
+		context.updateFPSCounter();
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
 		if (context.camera.posX > 7){
@@ -76,17 +77,35 @@ function camera() {
 	this.upZ = 0;
 }
 
-function glContext(canvasID){
+function glContext(canvas,fpsLabel){
 	this.glObjects = [];
-	this.canvas = document.getElementById(canvasID);
+	this.canvas = canvas;
+	this.fpsLabel = fpsLabel;
 	this.gl = getWebGLContext(this.canvas);
 	this.camera = new camera();
+	this.lastCalledTime = Date.now();
+	this.fps = 0;
+	this.prevFPSArray = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	
 	console.log(this.gl);
 	
 	this.addGLObject = function(glObj){
 		console.log('adding gl object:');
 		console.log(glObj);
 		this.glObjects.push(glObj);
+	}
+	
+	this.updateFPSCounter = function(){
+		delta = (new Date().getTime() - this.lastCalledTime)/1000;
+		this.lastCalledTime = Date.now();
+		this.fps = 1/delta;
+		this.prevFPSArray.push(this.fps);
+		this.prevFPSArray.shift();
+		var sumFPS = 0;
+		for (i=0;i<this.prevFPSArray.length;i++){
+			sumFPS += this.prevFPSArray[i];
+		}
+		$(this.fpsLabel).text((sumFPS / this.prevFPSArray.length).toFixed(2));
 	}
 }
 
@@ -122,6 +141,8 @@ function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertex
 		}
 		
 		gl.enable(gl.DEPTH_TEST);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
 		
 		this.initialized = true;
 		return this;
@@ -140,7 +161,6 @@ function ship(context,vertexShaderSource,fragmentShaderSource,vertexArray,vertex
 		}
 		this.animate(Date.now() - this.last_update);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
 		
 		
 		var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
